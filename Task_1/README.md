@@ -17,11 +17,12 @@ Output JSON dict to stdout with the following keys:
     - In case of "df": [Filesystem, 1K-blocks, Used, Available, Use%, Mounted on]
 
 #### Requirements
-Utility use ***python 3.6.x***, ***json***, ***subprocess.Popen***, ***argrapse***;
+Utility use ***python 3.6.x***, ***json***, ***subprocess.Popen***, ***argrapse***.
+
 Utility is written according to OOP principles:
 - Separate class for executors with base class;
 - Separate class for parsers with base class;
-- Executor classes encapsulate parser classes;
+- Executor classes encapsulate parser classes.
 
 All code is covered by unittests (using framework ***unittest***).
 
