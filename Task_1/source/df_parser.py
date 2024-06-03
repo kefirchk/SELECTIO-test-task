@@ -1,4 +1,6 @@
-class DFParser:
+from base_parser import BaseParser
+
+class DFParser(BaseParser):
     def __init__(self, args):
         self.__header = self.__get_header_by_args(args)
 

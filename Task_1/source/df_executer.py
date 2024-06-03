@@ -1,7 +1,8 @@
 from .df_parser import DFParser
+from base_executer import BaseExecuter
 import subprocess
 
-class DFExecuter:
+class DFExecuter(BaseExecuter):
     def __init__(self, args):
         self.__options = self.__get_options_by_args(args)
         self.__parser = DFParser(args)
