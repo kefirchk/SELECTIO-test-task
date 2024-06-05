@@ -1,4 +1,4 @@
-from base_parser import BaseParser
+from .base_parser import BaseParser
 
 class DFParser(BaseParser):
     def __init__(self, args):
