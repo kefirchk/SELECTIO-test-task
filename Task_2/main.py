@@ -1,28 +1,21 @@
-from argument_parser import ArgumentParser
-from ssh_interface import SSHInterface
-
-PROTOCOL = "ssh"
-HOST = "192.168.0.3"
-USER = "alexei"
-OPTION = "-p"
-PASSWORD = "1234"
-COMMAND = "ls"
-
-def main():
-    #argparser = ArgumentParser()
-    #args = argparser.get_args()
-    #print(args.password)
-    #print(args.file_name)
-    #password = argparser.get_password(args)
-    #print(password)
-
-    ssh_interface = SSHInterface(protocol=PROTOCOL, host=HOST, user=USER, password=PASSWORD, option=OPTION)
-
-    stdout, stderr, returncode = ssh_interface.exec_command(COMMAND)
-    print('STDOUT:', stdout)
-    print('STDERR:', stderr)
-    print('Return Code:', returncode)
+from netspeedometer import NetSpeedometer, IperfParser, ArgumentParser
+import json
 
 
 if __name__ == "__main__":
-    main()
+
+    arg_parser = ArgumentParser()
+    args = arg_parser.get_args()
+    password, option = arg_parser.get_password(args)
+
+    try:
+        netspeedometer = NetSpeedometer(host=args.host, user=args.user, password=password, option=option)
+        output, error, returncode = netspeedometer.exec_iperf()
+
+        parser = IperfParser(output, error, returncode)
+        result = parser.parse()
+        print(json.dumps(result, indent=4))
+
+    except Exception as e:
+        print(json.dumps({"error": str(e), "result": "", "status": 1}, indent=4))
+
