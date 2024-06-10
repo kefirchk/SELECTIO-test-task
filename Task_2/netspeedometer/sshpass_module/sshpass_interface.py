@@ -1,6 +1,5 @@
 import subprocess
 
-
 class SSHPASSInterface:
     def __init__(self, host, user, password, option='-p', protocol='ssh'):
         self.host = host

@@ -14,12 +14,12 @@ class NetSpeedometer(SSHPASSInterface):
         print("Loading of server...")
         server_thread = threading.Thread(target=self.exec_command, args=(f"{self.bandwidth_tester} -s -1",))
         server_thread.start()
-        self.wait_server_loading() # вместо time.sleep(20)
+        self.wait_server_loading()
 
         # Запуск iperf3 на клиенте
         print("Loading of client...")
         client_command = f"{self.bandwidth_tester} -c {self.host} -J"
-        client_process = subprocess.Popen(client_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        client_process = subprocess.Popen(client_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, encoding='utf-8')
         stdout, stderr = client_process.communicate()
 
         return stdout, stderr, client_process.returncode
@@ -27,9 +27,10 @@ class NetSpeedometer(SSHPASSInterface):
     def wait_server_loading(self):
         code = -1
         start = time.time()
+
         while code != 0:
             outs, errs, code = self.exec_command(f"pgrep {self.bandwidth_tester}")
             end = time.time()
             if end - start > 20:
                 raise TimeoutError("Server bandwidth tester did not load")
-
+            time.sleep(1)

@@ -1,6 +1,5 @@
 import argparse
 
-
 class ArgumentParser:
     def get_args(self):
         parser = argparse.ArgumentParser(description='Description of utility')
