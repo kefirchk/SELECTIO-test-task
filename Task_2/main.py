@@ -3,7 +3,6 @@ import json
 
 
 if __name__ == "__main__":
-
     arg_parser = ArgumentParser()
     args = arg_parser.get_args()
     password, option = arg_parser.get_password(args)
