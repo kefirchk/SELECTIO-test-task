@@ -1,1 +1,1 @@
-from .sshpass_interface import SSHPASSInterface
+from .sshpass_interface import SshpassInterface

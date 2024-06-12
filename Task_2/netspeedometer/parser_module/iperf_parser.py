@@ -1,7 +1,7 @@
 import json
 
 class IperfParser:
-    def __init__(self, outs, errs, returncode):
+    def __init__(self, outs: str, errs: str, returncode: int):
         self.outs = outs
         self.errs = errs
         self.returncode = returncode

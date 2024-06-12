@@ -3,12 +3,9 @@ import json
 
 
 if __name__ == "__main__":
-    arg_parser = ArgumentParser()
-    args = arg_parser.get_args()
-    password, option = arg_parser.get_password(args)
-
+    args = ArgumentParser.get_args()
     try:
-        netspeedometer = NetSpeedometer(host=args.host, user=args.user, password=password, option=option)
+        netspeedometer = NetSpeedometer(net_args=args)
         output, error, returncode = netspeedometer.exec_iperf()
 
         parser = IperfParser(output, error, returncode)

@@ -1,36 +1,40 @@
-from .sshpass_module import SSHPASSInterface
-import subprocess
+from .sshpass_module import SshpassInterface
+from .network_params import NetworkParams
 import threading
-import time
 
 
-class NetSpeedometer(SSHPASSInterface):
-    def __init__(self, host, user, password, option, protocol="ssh", bandwidth_tester="iperf3"):
-        super().__init__(host, user, password, option, protocol)
+class NetSpeedometer:
+    def __init__(self, net_args, protocol="ssh", bandwidth_tester="iperf3"):
+        self.net_params = NetworkParams(net_args)
+        self.protocol = protocol
         self.bandwidth_tester = bandwidth_tester
+        self.server_sshpass = SshpassInterface(host=self.net_params.server_ip,
+                                               user=self.net_params.server_user,
+                                               password=self.net_params.server_password,
+                                               pass_option=self.net_params.server_pass_option,
+                                               protocol=self.protocol)
+        self.client_sshpass = SshpassInterface(host=self.net_params.client_ip,
+                                               user=self.net_params.client_user,
+                                               password=self.net_params.client_password,
+                                               pass_option=self.net_params.client_pass_option,
+                                               protocol=self.protocol)
+
 
     def exec_iperf(self):
         # Запуск iperf3 на сервере
         print("Loading of server...")
-        server_thread = threading.Thread(target=self.exec_command, args=(f"{self.bandwidth_tester} -s -1",))
+        server_command = f"{self.bandwidth_tester} -s -1"
+        server_thread = threading.Thread(target=self.server_sshpass.exec_command, args=(server_command,))
         server_thread.start()
-        self.wait_server_loading()
+        self.server_sshpass.wait_loading(self.bandwidth_tester)
 
         # Запуск iperf3 на клиенте
         print("Loading of client...")
-        client_command = f"{self.bandwidth_tester} -c {self.host} -J"
-        client_process = subprocess.Popen(client_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, encoding='utf-8')
-        stdout, stderr = client_process.communicate()
+        client_command = f"{self.bandwidth_tester} -c {self.net_params.server_ip} -J"
+        stdout, stderr, returncode = self.client_sshpass.exec_command(client_command)
 
-        return stdout, stderr, client_process.returncode
+        if returncode:
+            self.server_sshpass.stop_process(self.bandwidth_tester)
+            raise Exception("Connection error")
 
-    def wait_server_loading(self):
-        code = -1
-        start = time.time()
-
-        while code != 0:
-            outs, errs, code = self.exec_command(f"pgrep {self.bandwidth_tester}")
-            end = time.time()
-            if end - start > 20:
-                raise TimeoutError("Server bandwidth tester did not load")
-            time.sleep(1)
+        return stdout, stderr, returncode
